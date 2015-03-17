@@ -1,0 +1,62 @@
+import RPi.GPIO as GPIO
+from time import sleep
+
+GPIO.setmode(GPIO.BOARD)
+
+TestPin = 18
+
+GPIO.setup(TestPin,GPIO.OUT)
+
+print "LED"
+GPIO.output(TestPin,GPIO.HIGH)
+sleep(1)
+GPIO.output(TestPin,GPIO.LOW)
+sleep(1)
+GPIO.output(TestPin,GPIO.HIGH)
+sleep(1)
+GPIO.output(TestPin,GPIO.LOW)
+sleep(1)
+GPIO.output(TestPin,GPIO.HIGH)
+sleep(1)
+GPIO.output(TestPin,GPIO.LOW)
+sleep(1)
+GPIO.output(TestPin,GPIO.HIGH)
+sleep(1)
+GPIO.output(TestPin,GPIO.LOW)
+sleep(1)
+GPIO.output(TestPin,GPIO.HIGH)
+sleep(1)
+GPIO.output(TestPin,GPIO.LOW)
+sleep(1)
+GPIO.output(TestPin,GPIO.HIGH)
+sleep(1)
+GPIO.output(TestPin,GPIO.LOW)
+sleep(1)
+GPIO.output(TestPin,GPIO.HIGH)
+sleep(1)
+GPIO.output(TestPin,GPIO.LOW)
+sleep(1)
+GPIO.output(TestPin,GPIO.HIGH)
+sleep(1)
+GPIO.output(TestPin,GPIO.LOW)
+sleep(1)
+GPIO.output(TestPin,GPIO.HIGH)
+sleep(1)
+GPIO.output(TestPin,GPIO.LOW)
+sleep(1)
+GPIO.output(TestPin,GPIO.HIGH)
+sleep(1)
+GPIO.output(TestPin,GPIO.LOW)
+sleep(1)
+GPIO.output(TestPin,GPIO.HIGH)
+sleep(1)
+GPIO.output(TestPin,GPIO.LOW)
+sleep(1)
+GPIO.output(TestPin,GPIO.HIGH)
+sleep(1)
+GPIO.output(TestPin,GPIO.LOW)
+sleep(1)
+
+print "done"
+
+GPIO.output(TestPin,GPIO.LOW)
