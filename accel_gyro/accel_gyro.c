@@ -18,7 +18,7 @@
 #include <stdarg.h>
 #include <errno.h>
 
-#define DT 0.5 // [s/loop] loop period. 20ms
+#define DT 0.1// [s/loop] loop period. 20ms
 #define AA 0.97         // complementary filter constant
 
 #define A_GAIN 0.0573      // [deg/LSB]
@@ -153,7 +153,8 @@ int main(int argc, char *argv[])
 	CFangleY=AA*(CFangleY+rate_gyr_y*DT) +(1 - AA) * AccYangle;
 
 
-	//printf ("CFangleX %7.3f CFangleY %7.3f\n",CFangleX,CFangleY);
+//	printf ("CFangleX %7.3f CFangleY %7.3f Z: %7.3f\n",gyroXangle,gyroYangle, gyroZangle);
+
         printf("cfangle_x: %7.3f cfangle_y: %7.3f \n", CFangleX, CFangleY);                                                                                                                                                                                                                                                                                                   
 
 	//Each loop should be at least 20ms.
