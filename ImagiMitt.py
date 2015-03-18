@@ -12,26 +12,26 @@ import datetime
 import servo.servo as servo
 import peltier.peltier as peltier
 
+CLIENT_ADDR = ('10.22.214.188', 8000)
+accel_gyro = ["", ""]
+servo_data = ["",""]
+sock = 'nil'
+
 class server (threading.Thread):
     def __init__(self, threadID, name, port):
         threading.Thread.__init__(self)
         self.threadID = threadID
         self.name = name
         self.port = port
-	peltier.Peltier.init()
+	if (name == "peltier"):
+            peltier.Peltier.init()
     
     def run(self):
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-
-        ip = 0
-        
-
-        interfaces = get_interfaces(sock)
-        for interface in interfaces:
-            if interface[0] is 'eth0' or 'wlan0':
-                ip = interface[1]
-
-	server_address = (ip, self.port)
+        ip = get_ip(sock)
+        if (self.name is 'accel_gyro'):
+            ip = "127.0.0.1"
+        server_address = (ip, self.port)
 
         sock.bind(server_address)
         print '%s %s %s \n' % (ip, self.port, self.name)
@@ -41,10 +41,10 @@ class server (threading.Thread):
 
         while True:
             data, addr = sock.recvfrom(1024)
-            print data
 	    print self.port
 
             # JSON Info
+            print(data)
             info = json.loads(data)
             print datetime.datetime.now().time()
             if (self.name is 'servo'):
@@ -58,6 +58,14 @@ class server (threading.Thread):
 			servo_exec = threading.Thread(target=servo.Servo.stop, args=())
 		    servo_exec.start()	
                 
+            elif (self.name is 'accel_gyro'):
+                # {'accel_gyro_x': xxx.xxx, 'accel_gyro_y': xxx.xxx}
+                print(info["accel_gyro"])
+                
+                accel_gyro[0] = info["accel_gyro"]["x"]
+                accel_gyro[1] = info["accel_gyro"]["y"]
+                sock_d = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                sock_d.sendto("{ \"timestamp\": " + str(int(time.time())) + ", \"accel_gyro\": {\"x\": " + str(accel_gyro[0]) + ", \"y\": " + str(accel_gyro[1]) + "}}", ("10.22.214.188", 8000))
             else:
                 # { 'timestamp': aabbccxxyyzz, 'temperature': 5 }
                 if (peltier_exec is None or (peltier_exec is not None and not peltier_exec.is_alive())):
@@ -69,6 +77,16 @@ class server (threading.Thread):
 			peltier_exec = threading.Thread(target=peltier.Peltier.cold, args=())
 		    peltier_exec.start()
 
+
+def get_ip(sock):
+    ip = 0
+
+    interfaces = get_interfaces(sock)
+    for interface in interfaces:
+        if interface[0] is 'eth0' or 'wlan0':
+            ip = interface[1]
+
+    return ip
 
 def format_ip(ip):
     return str(ord(ip[0])) + '.' \
@@ -99,15 +117,20 @@ def get_interfaces(sock):
 
     return interfaces
         
-
 servo_server = server(1, "servo", 3000)
 peltier_server = server(2, "peltier", 3001)
+accel_gyro_server = server(3, "accel_gyro", 3002)
+
 servo_server.daemon = True
 peltier_server.daemon = True
+accel_gyro_server.daemon = True
 
+# Running on seperate thread
+accel_gyro_server.start()
 # Running on seperate thread
 servo_server.start()
 # Running on main thread
 peltier_server.run()
+
     
 

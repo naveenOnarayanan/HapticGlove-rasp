@@ -7,14 +7,42 @@
 #include <string.h>
 #include <time.h>
 #include "sensor.c"
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <netdb.h>
+#include <string.h>
+#include <sys/ioctl.h>
+#include <net/if.h>
+#include <arpa/inet.h>
+#include <stdarg.h>
+#include <errno.h>
 
-#define DT 0.02         // [s/loop] loop period. 20ms
+#define DT 0.5 // [s/loop] loop period. 20ms
 #define AA 0.97         // complementary filter constant
 
 #define A_GAIN 0.0573      // [deg/LSB]
 #define G_GAIN 0.070     // [deg/s/LSB]
 #define RAD_TO_DEG 57.29578
 #define M_PI 3.14159265358979323846
+#define SERVER_PORT 3002
+unsigned char buffer[1500];
+int clientSocketId;
+
+void sendData(double x, double y) {
+	struct sockaddr_in connectionSocketAddress;
+
+	memset(&connectionSocketAddress, 0, sizeof(connectionSocketAddress));
+
+	connectionSocketAddress.sin_family = AF_INET;
+	connectionSocketAddress.sin_addr.s_addr = inet_addr("0.0.0.0");
+	connectionSocketAddress.sin_port = htons(SERVER_PORT);
+
+	sprintf(buffer, "{ \"accel_gyro\": {\"x\": %7.3f, \"y\": %7.3f}}\0", x, y);
+        printf("%d\n", strlen(buffer));
+	sendto(clientSocketId, buffer, strlen(buffer), 0, (struct sockaddr *)&connectionSocketAddress, sizeof(connectionSocketAddress));
+
+}
 
 void  INThandler(int sig)
 {
@@ -39,6 +67,12 @@ int timeval_subtract(struct timeval *result, struct timeval *t2, struct timeval 
 
 int main(int argc, char *argv[])
 {
+
+        clientSocketId = socket(AF_INET, SOCK_DGRAM, 0);
+        if (clientSocketId < 0) {
+            printf("Failed opening socket\n");
+            exit(EXIT_FAILURE);
+        }
 
 	float rate_gyr_y = 0.0;   // [deg/s]
 	float rate_gyr_x = 0.0;    // [deg/s]
@@ -127,6 +161,10 @@ int main(int argc, char *argv[])
         {
             usleep(100);
         }
+
+        printf("Sending..\n");
+        sendData(CFangleX, CFangleY);
+
     }
 }
 
