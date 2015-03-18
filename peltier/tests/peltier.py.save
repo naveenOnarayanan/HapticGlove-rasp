@@ -1,0 +1,17 @@
+import RPi.GPIO as GPIO
+
+class Peltier:
+	def __init__(self):
+		self.warm = 22
+		self.cool = 21
+		self.enable = 18
+		GPIO.setup(self.warm,GPIO.OUT)
+		GPIO.setup(self.cool,GPIO.OUT)
+		GPIO.setup(self.enable,GPIO.OUT)
+
+	def hot:
+
+	def cold:
+
+	def stop:
+		

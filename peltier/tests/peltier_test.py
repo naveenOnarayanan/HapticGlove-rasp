@@ -1,5 +1,5 @@
 from time import sleep
-import peltier.peltier as peltier
+import peltier as peltier
 
 print 'init'
 peltier.Peltier.init()
