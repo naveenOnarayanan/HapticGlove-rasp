@@ -38,10 +38,6 @@ def send(motor_hash, ser):
 		item_count += 1
 	ser.write("\n")
 
-# todo:
-# make sure you're throwing the proper error
-# figure out how to keep the `last_sent` in your class
-
 happy_test_vals = [{"finger":20}, {"finger":3, "thumb":4}, {"finger":180, "under":0}, {"finger":0, "under":180, "thumb":90}, {"finger":900, "under":900, "thumb":900}]
 error_test_vals = [{"finger":180, "under":180}, {"finger":180, "under":180, "thumb":90}, {"finger":0, "under":180, "thumb":90, "dicks":20}]
 
