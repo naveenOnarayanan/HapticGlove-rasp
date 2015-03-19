@@ -8,14 +8,16 @@ import time
 import json
 import multiprocessing
 import datetime
-
+import serial
 import servo.servo as servo
 import peltier.peltier as peltier
 
 CLIENT_ADDR = ('10.22.214.188', 8000)
 accel_gyro = ["", ""]
-servo_data = ["",""]
+servo_data = ["","",""]
 sock = 'nil'
+
+# Initialize once for reading and writing
 ser = serial.Serial('/dev/ttyACM0', 9600)
 
 class server (threading.Thread):
@@ -32,7 +34,7 @@ class server (threading.Thread):
     def run(self):
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         ip = get_ip(sock)
-        if (self.name is 'accel_gyro'):
+        if (self.name is 'accel_gyro' or self.name is 'servo_read'):
             ip = "127.0.0.1"
         server_address = (ip, self.port)
 
@@ -68,7 +70,11 @@ class server (threading.Thread):
                 accel_gyro[0] = info["accel_gyro"]["x"]
                 accel_gyro[1] = info["accel_gyro"]["y"]
                 sock_d = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-                sock_d.sendto("{ \"timestamp\": " + str(int(time.time())) + ", \"accel_gyro\": {\"x\": " + str(accel_gyro[0]) + ", \"y\": " + str(accel_gyro[1]) + "}}", ("10.22.214.188", 8000))
+                sock_d.sendto("{ \"timestamp\": " + str(int(time.time())) + ", \"servo\": [" + str(servo_data[0]) + ", " + str(servo_data[1]) + ", " + str(servo_data[2]) + "], \"accel_gyro\": {\"x\": " + str(accel_gyro[0]) + ", \"y\": " + str(accel_gyro[1]) + "}}", ("10.22.214.188", 8000))
+            elif (self.name is 'servo_read'):
+                servo_data[0] = info["servo"][0]
+                servo_data[1] = info["servo"][1]
+                servo_data[2] = info["servo"][2]
             else:
                 # { 'timestamp': aabbccxxyyzz, 'temperature': 5 }
                 if (peltier_exec is None or (peltier_exec is not None and not peltier_exec.is_alive())):
@@ -123,17 +129,20 @@ def get_interfaces(sock):
 servo_server = server(1, "servo", 3000)
 peltier_server = server(2, "peltier", 3001)
 accel_gyro_server = server(3, "accel_gyro", 3002)
+servo_read_server = server(4, "servo_read", 3003)
 
 servo_server.daemon = True
 peltier_server.daemon = True
 accel_gyro_server.daemon = True
+servo_read_server.daemon = True
 
 # Running on seperate thread
 accel_gyro_server.start()
 # Running on seperate thread
 servo_server.start()
+# Running on seperate thread
+servo_read_server.start()
 # Running on main thread
 peltier_server.run()
-
     
 
