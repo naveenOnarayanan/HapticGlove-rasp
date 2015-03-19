@@ -16,6 +16,7 @@ CLIENT_ADDR = ('10.22.214.188', 8000)
 accel_gyro = ["", ""]
 servo_data = ["",""]
 sock = 'nil'
+ser = serial.Serial('/dev/ttyACM0', 9600)
 
 class server (threading.Thread):
     def __init__(self, threadID, name, port):
@@ -23,8 +24,10 @@ class server (threading.Thread):
         self.threadID = threadID
         self.name = name
         self.port = port
-	if (name == "peltier"):
+        if (name == "peltier"):
             peltier.Peltier.init()
+        if (name == "servo"):
+            servo.Servo()
     
     def run(self):
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
