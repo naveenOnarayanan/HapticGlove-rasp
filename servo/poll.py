@@ -18,8 +18,9 @@ def receiving(ser):
             for i in range(len(data)):
                 angle_raw = data[i].split(':')
                 data[i] = angle_raw[len(angle_raw) - 1]
-            sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-            sock.sendto("{\"servo\": [" + str(data[0]) + "," + str(data[1]) + "," + str(data[2]) + "]}", ("127.0.0.1", 3003))
+            # sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            # sock.sendto("{\"servo\": [" + str(data[0]) + "," + str(data[1]) + "," + str(data[2]) + "]}", ("127.0.0.1", 3003))
+            print (data)
 
-ser = serial.Serial('/dev/ttyACM0', 9600)
+ser = serial.Serial(3, 9600)
 receiving(ser)

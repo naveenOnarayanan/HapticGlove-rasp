@@ -1,9 +1,9 @@
 import serial
 import time
-import ipdb
 
 # can be easily replaced with a file name for testing without servos
-ser = serial.Serial('/dev/ttyACM0', 9600)
+#ser = serial.Serial('/dev/ttyACM0', 9600)
+ser = serial.Serial('COM4', 9600)
 #ser = open("servo_output.txt", "w")
 
 # tested and functional

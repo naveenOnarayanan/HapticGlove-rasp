@@ -1,7 +1,8 @@
 class Servo:
-	def __init__(self):
+	def __init__(self, ser):
 		self.last_sent = {"finger":0, "thumb":0, "under":180}
 		self.servo_table = {"finger":0, "thumb":1, "under":2}
+		self.ser = ser
 
 	def add_zeros_to_int(self, int_val):
 		if(len(str(int_val)) == 1):
@@ -15,14 +16,14 @@ class Servo:
 		item_count = 0
 		for motor, pos in self.last_sent.iteritems():
 			if motor in motor_hash:
-				ser.write("%s:%s" 
+				self.ser.write("%s:%s" 
 					%(
 						self.servo_table[motor],
 						add_zeros_to_int(motor_hash[motor])
 					)
 				)
 			else:
-				ser.write("%s:%s" 
+				self.ser.write("%s:%s" 
 					%(
 						self.servo_table[motor],
 						add_zeros_to_int(pos)
@@ -30,12 +31,11 @@ class Servo:
 				)
 
 			if(item_count < 2):
-				ser.write(",")
+				self.ser.write(",")
 			item_count += 1
-		ser.write("\n")
+		self.ser.write("\n")
 
 	def tilt(self, degrees, motor = "finger"):
-		servo = PWM.Servo()
 		if(degrees < 0 or degrees > 180):
 			print("TOO FAR")
 			return
